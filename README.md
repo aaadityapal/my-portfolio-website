@@ -23,7 +23,7 @@ A modern, responsive personal portfolio website built with HTML, CSS, and JavaSc
 
 ## Live Demo
 
-[View Live Demo](https://github.com/aaadityapal/my-portfolio-website.git)
+[View Live Demo](https://aaadityapal.netlify.app/)
 
 ## Setup
 
