@@ -748,7 +748,7 @@
                 const typingIndicator = showTypingIndicator();
                 
                 try {
-                    const response = await fetch('/api/chat', {
+                    const response = await fetch('/.netlify/functions/chat', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -759,7 +759,18 @@
                     // Remove typing indicator
                     typingIndicator.remove();
                     
-                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    // Check for empty response
+                    const text = await response.text();
+                    if (!text) {
+                        throw new Error('Empty response received');
+                    }
+                    
+                    // Parse the JSON response
+                    const data = JSON.parse(text);
                     
                     if (data.error) {
                         throw new Error(data.error.message || 'API Error');
@@ -780,7 +791,7 @@
                     typingIndicator.remove();
                     
                     console.error('Error:', error);
-                    appendMessage('bot', `Error: ${error.message}`);
+                    appendMessage('bot', 'Sorry, I encountered an error. Please try again later.');
                 }
             }
 
