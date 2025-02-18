@@ -1,6 +1,6 @@
 [build]
   publish = "/"
-  command = ""  # Leave empty for static sites
+  command = "npm install"  # Install dependencies
   functions = "netlify/functions"
 
 [[redirects]]

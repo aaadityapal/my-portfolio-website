@@ -1,3 +1,5 @@
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
 exports.handler = async function(event, context) {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
@@ -7,30 +9,43 @@ exports.handler = async function(event, context) {
     };
   }
 
+  // Get API key from environment variable
+  const API_KEY = process.env.GOOGLE_AI_API_KEY;
+
+  if (!API_KEY) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'API key not configured' })
+    };
+  }
+
   try {
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
     const body = JSON.parse(event.body);
     const message = body.message;
 
-    // Here you can add your chatbot logic
-    // For now, let's just echo back a simple response
-    const response = {
-      candidates: [{
-        content: {
-          parts: [{
-            text: `You said: ${message}. This is a test response from the chatbot.`
-          }]
-        }
-      }]
-    };
-
+    const result = await model.generateContent(message);
+    const response = await result.response;
+    
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(response)
+      body: JSON.stringify({
+        candidates: [{
+          content: {
+            parts: [{
+              text: response.text()
+            }]
+          }
+        }]
+      })
     };
   } catch (error) {
+    console.error('Error:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal Server Error' })
